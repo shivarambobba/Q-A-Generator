@@ -8,6 +8,7 @@ A Flask-based PDF Q&A application that extracts text from uploaded PDF files and
 - Generate question-answer pairs from document content
 - Support for whole-document, chapter-wise, or topic-wise question generation
 - Select number of questions and question style
+- Ask follow-up questions against the uploaded document using retrieval-augmented answers
 - Show inferred sections or topics for generated Q&A
 - Lightweight frontend with a clean upload UI
 
@@ -93,8 +94,9 @@ PORT=5001 python3 app.py
    - `Conceptual`
    - `Exam-style`
 6. Click `Analyze PDF`.
+8. After the PDF is processed, use the new Ask-the-document box to send follow-up questions and receive retrieval-augmented answers based on the uploaded content.
 
-The generated output includes questions, answers, and optional inferred section/topic metadata.
+The generated output includes questions, answers, and optional inferred section/topic metadata. The follow-up chat uses only the document content to answer, which improves precision and reduces hallucinations.
 
 ## Project Structure
 

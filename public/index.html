@@ -54,6 +54,16 @@
 
   <div id="result" class="card" style="display: none;"></div>
 
+  <div id="chat-card" class="card" style="display: none;">
+    <form id="chat-form">
+      <label for="chatQuestion">Ask the document:</label>
+      <input id="chatQuestion" name="chatQuestion" type="text" placeholder="Enter a question" required />
+      <button type="submit">Ask</button>
+    </form>
+    <div id="chat-status" class="status"></div>
+    <div id="chat-answer" class="card" style="display: none; margin-top: 16px;"></div>
+  </div>
+
   <script src="/script.js"></script>
 </body>
 </html>

@@ -47,6 +47,12 @@ else:
 
 app = Flask(__name__, static_folder="public", static_url_path="")
 
+document_store = {
+    "chunks": [],
+    "embeddings": [],
+    "source": "",
+}
+
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -95,6 +101,10 @@ def upload_pdf():
         question_count = 0
 
     chunk_embeddings = [get_embedding(chunk) for chunk in chunks]
+    document_store["chunks"] = chunks
+    document_store["embeddings"] = chunk_embeddings
+    document_store["source"] = text
+
     result = generate_qa_pairs(
         chunks,
         chunk_embeddings,
@@ -103,6 +113,58 @@ def upload_pdf():
         question_count=question_count,
     )
     return jsonify({"qa": result})
+
+
+@app.route("/chat", methods=["POST"])
+def chat_document():
+    data = request.get_json(silent=True) or {}
+    question = str(data.get("question", "")).strip()
+    if not question:
+        return jsonify({"error": "Question is required."}), 400
+
+    if not document_store["chunks"]:
+        return jsonify({"error": "Upload a PDF first so the document can be indexed."}), 400
+
+    top_chunks = retrieve_relevant_chunks(question, top_k=6)
+    if not top_chunks:
+        return jsonify({"error": "No relevant document content was found."}), 500
+
+    answer = generate_rag_answer(question, top_chunks)
+    return jsonify({"answer": answer})
+
+
+def retrieve_relevant_chunks(query: str, top_k: int = 5) -> list[str]:
+    query_embedding = get_embedding(query)
+    scored_chunks = [
+        (cosine_similarity(query_embedding, embedding), chunk)
+        for embedding, chunk in zip(document_store["embeddings"], document_store["chunks"])
+    ]
+    scored_chunks.sort(key=lambda item: item[0], reverse=True)
+    return [chunk for _, chunk in scored_chunks[:top_k]]
+
+
+def generate_rag_answer(question: str, top_chunks: list[str]) -> str:
+    context_text = "\n\n---\n\n".join(top_chunks)
+    prompt = (
+        "Use only the document content below to answer the user question. "
+        "Do not hallucinate or invent answers. If the document does not contain the answer, "
+        "respond with: 'I don't know based on the provided document.'\n\n"
+        "Document content:\n"
+        f"{context_text}\n\n"
+        "Question: "
+        f"{question}\n\n"
+        "Answer:" 
+    )
+
+    if use_openrouter:
+        return get_openrouter_completion(prompt)
+
+    response = client.models.generate_content(
+        model=GENERATION_MODEL,
+        contents=prompt,
+        config={"temperature": 0.2, "max_output_tokens": 1024},
+    )
+    return extract_generated_text(response)
 
 
 def extract_text_from_pdf(pdf_file) -> str:
