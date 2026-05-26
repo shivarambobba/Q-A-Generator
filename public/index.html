@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PDF Q&A Chat</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 900px; margin: 40px auto; padding: 0 20px; line-height: 1.6; }
+    h1 { margin-bottom: 0.2em; }
+    .card { border: 1px solid #ddd; border-radius: 12px; padding: 20px; margin-top: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+    form { display: grid; gap: 14px; }
+    label { display: block; font-weight: 600; margin-bottom: 4px; }
+    input[type="file"], input[type="number"], select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 8px; }
+    button { background: #2563eb; color: white; border: none; padding: 12px 18px; border-radius: 8px; cursor: pointer; width: fit-content; }
+    button:hover { background: #1e40af; }
+    #result { white-space: pre-wrap; }
+    .question { margin-top: 1rem; font-weight: 700; }
+    .answer { margin: 0.3rem 0 1rem 0; }
+    .meta { color: #475569; font-size: 0.95rem; margin-top: 0.25rem; }
+    .status { margin-top: 16px; }
+  </style>
+</head>
+<body>
+  <h1>PDF Q&A Chat</h1>
+  <p>Upload a readable PDF file and generate question-answer pairs from the document content.</p>
+
+  <div class="card">
+    <form id="upload-form">
+      <label for="pdfFile">Choose PDF:</label>
+      <input id="pdfFile" name="pdfFile" type="file" accept="application/pdf" required />
+
+      <label for="questionMode">Question mode:</label>
+      <select id="questionMode" name="questionMode">
+        <option value="whole">Whole document</option>
+        <option value="chapter">Chapter-wise</option>
+        <option value="topic">Topic-wise</option>
+      </select>
+
+      <label for="questionCount">Desired questions:</label>
+      <input id="questionCount" name="questionCount" type="number" min="5" max="80" value="30" />
+
+      <label for="questionStyle">Question style:</label>
+      <select id="questionStyle" name="questionStyle">
+        <option value="mixed">Mixed</option>
+        <option value="factual">Factual</option>
+        <option value="conceptual">Conceptual</option>
+        <option value="exam">Exam-style</option>
+      </select>
+
+      <button type="submit">Analyze PDF</button>
+    </form>
+    <div id="status" class="status"></div>
+  </div>
+
+  <div id="result" class="card" style="display: none;"></div>
+
+  <script src="/script.js"></script>
+</body>
+</html>

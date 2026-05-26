@@ -1,0 +1,9 @@
+{
+  "name": "virtual-chat-bot",
+  "version": "1.0.0",
+  "description": "Flask PDF Q&A app with Gemini integration.",
+  "main": "app.py",
+  "scripts": {
+    "start": "python3 app.py"
+  }
+}
